@@ -14,13 +14,26 @@
             --texto-parrafos: #4a148c; 
             --fondo-cartas: #fdf2f6; 
             --azul-pastel: #bbdefb; 
-            --sombra: rgba(136, 14, 79, 0.12);
+            --sombra: rgba(136, 14, 79, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Quicksand', sans-serif; background-color: var(--fondo-principal); overflow-x: hidden; }
 
+        /* --- REPRODUCTOR Y BARRA DE MÚSICA ESTILO AJEDREZ --- */
         #musica-fondo { display: none; }
+        
+        #control-musica {
+            position: fixed; top: 20px; right: 20px;
+            background: var(--fondo-cartas); border: 2.5px solid var(--texto-titulos);
+            padding: 8px 16px; border-radius: 30px; box-shadow: 0 5px 20px var(--sombra);
+            display: none; align-items: center; gap: 12px; z-index: 4000;
+            transition: transform 0.3s;
+        }
+        #control-musica:hover { transform: scale(1.03); }
+        .btn-musica { background: var(--azul-pastel); border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+        .vol-slider { width: 70px; accent-color: var(--texto-titulos); cursor: pointer; }
+        .vol-texto { font-weight: bold; color: var(--texto-parrafos); font-size: 13px; min-width: 35px; }
 
         /* --- PANTALLA DE INICIO DE SESIÓN --- */
         #pantalla-login {
@@ -67,7 +80,7 @@
             50% { transform: translateY(-25px); }
         }
 
-        header { text-align: center; padding: 70px 20px 40px; }
+        header { text-align: center; padding: 80px 20px 40px; }
         header h1 { font-family: 'Caveat', cursive; font-size: 65px; color: var(--texto-titulos); margin-bottom: 5px; }
         header h2 { font-size: 24px; color: var(--texto-parrafos); background-color: var(--azul-pastel); display: inline-block; padding: 8px 28px; border-radius: 30px; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
 
@@ -94,17 +107,32 @@
         .btn-juego { background-color: var(--texto-titulos); color: white; padding: 15px 35px; font-size: 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: transform 0.2s; box-shadow: 0 4px 15px var(--sombra); }
         .btn-juego:hover { transform: scale(1.05); }
 
-        /* --- 3. SECCIÓN VIDEOS --- */
-        .seccion-videos { text-align: center; margin-top: 80px; padding: 20px; max-width: 1000px; margin-left: auto; margin-right: auto;}
-        .seccion-videos h3 { font-family: 'Caveat', cursive; font-size: 48px; color: var(--texto-titulos); margin-bottom: 30px; }
+        /* --- 3. SECCIÓN VIDEOS CON PANEL AGREGADOR --- */
+        .seccion-videos { text-align: center; margin-top: 80px; padding: 20px; max-width: 1000px; margin-left: auto; margin-right: auto; }
+        .seccion-videos h3 { font-family: 'Caveat', cursive; font-size: 48px; color: var(--texto-titulos); margin-bottom: 20px; }
+        
+        /* Panel para agregar videos */
+        .panel-agregar-video {
+            background: var(--fondo-cartas); border: 2.5px solid var(--azul-pastel);
+            padding: 25px; border-radius: 20px; max-width: 700px; margin: 0 auto 40px auto;
+            box-shadow: 0 8px 25px var(--sombra); text-align: left;
+        }
+        .panel-agregar-video h4 { color: var(--texto-titulos); margin-bottom: 15px; font-size: 18px; text-align: center; }
+        .inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .input-video { width: 100%; padding: 12px; border: 2px solid var(--azul-pastel); border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; }
+        .select-video { width: 100%; padding: 12px; border: 2px solid var(--azul-pastel); border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; background: white; color: var(--texto-parrafos); font-weight: bold; }
+        .btn-agregar-vid { background: var(--texto-titulos); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; transition: 0.3s; }
+        .btn-agregar-vid:hover { background: #6a053c; }
+
+        /* Filtros y Catálogo */
         .filtros-videos { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
         .btn-filtro { background: var(--azul-pastel); color: var(--texto-parrafos); border: 2px solid var(--texto-parrafos); padding: 10px 24px; border-radius: 20px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
         .btn-filtro:hover, .btn-filtro.activo { background: var(--texto-titulos); color: white; border-color: var(--texto-titulos); }
         
-        .grid-videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .video-item { background: var(--fondo-cartas); padding: 15px; border-radius: 16px; box-shadow: 0 8px 25px var(--sombra); transition: transform 0.3s; }
+        .grid-videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .video-item { background: var(--fondo-cartas); padding: 15px; border-radius: 16px; box-shadow: 0 8px 25px var(--sombra); transition: transform 0.3s; position: relative; }
         .video-item:hover { transform: translateY(-5px); }
-        .contenedor-iframe { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; }
+        .contenedor-iframe { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: #000; }
         .contenedor-iframe iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
         .video-titulo { font-family: 'Quicksand', sans-serif; font-weight: bold; color: var(--texto-parrafos); margin-top: 15px; font-size: 16px; }
 
@@ -148,7 +176,6 @@
         .cupon-img-circular { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--texto-titulos); flex-shrink: 0; }
         .cupon-texto { font-size: 22px; font-weight: 700; color: var(--texto-titulos); text-align: left; line-height: 1.4; }
         
-        /* Modal Ajedrez (Iframe Gigante) */
         .ajedrez-box { width: 95vw; max-width: 1200px; height: 90vh; background: var(--fondo-principal); border-radius: 16px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         .ajedrez-box iframe { flex: 1; width: 100%; height: 100%; border: none; border-radius: 16px; }
         
@@ -162,6 +189,8 @@
             header h1 { font-size: 48px; }
             .flecha-izq { left: -10px; } .flecha-der { right: -10px; }
             .ajedrez-box { height: 85vh; }
+            .inputs-grid { grid-template-columns: 1fr; }
+            #control-musica { top: 10px; right: 10px; padding: 6px 12px; }
         }
     </style>
 </head>
@@ -170,6 +199,12 @@
     <audio id="musica-fondo" loop>
         <source src="cancion.mp3" type="audio/mpeg">
     </audio>
+
+    <div id="control-musica">
+        <button class="btn-musica" id="btn-play-pause" onclick="toggleMusica()">⏸️</button>
+        <input type="range" class="vol-slider" id="slider-vol" min="0" max="100" value="40" oninput="cambiarVolumen()">
+        <span class="vol-texto" id="texto-vol">40%</span>
+    </div>
 
     <div id="pantalla-login">
         <div id="login-fondo"></div>
@@ -192,7 +227,6 @@
         </header>
 
         <main class="contenedor-recuerdos">
-            
             <div class="bloque-recuerdo">
                 <div class="texto-carta">
                     "Desde que llegaste a mi vida todo ha cambiado para mi, aun recuerdo ese hermoso dia que eramos desconocidos pero en el fondo estabamos destinados uno al otro"
@@ -205,7 +239,7 @@
 
             <div class="bloque-recuerdo">
                 <div class="texto-carta">
-                    "Aunque viviste mucho tiempo en los estados unidos nunca dejé de amarte, nunca dejé de comfiar en mi corazon, esos dias fueron duros pero al fin estas a mi lado uwu"
+                    "Aunque viviste mucho tiempo en los estados unidos nunca dejé de amarte, nunca dejé de confiar en mi corazon, esos dias fueron duros pero al fin estas a mi lado uwu"
                 </div>
                 <div class="polaroid" onclick="abrirGaleria(['foto-carta2-1.jpg', 'foto-carta2-2.jpg', 'foto-carta2-3.jpg'])">
                     <img src="foto-carta2-1.jpg" alt="Superando la Distancia">
@@ -230,7 +264,6 @@
                     <img src="foto-carta4-1.jpg" alt="Nuestro Futuro">
                 </div>
             </div>
-
         </main>
 
         <section class="zona-juego">
@@ -244,50 +277,36 @@
         <section class="seccion-videos">
             <h3>Nuestros Videos</h3>
             
+            <div class="panel-agregar-video">
+                <h4>➕ Agregar un nuevo video (Drive o YouTube)</h4>
+                <div class="inputs-grid">
+                    <input type="text" id="vid-url" class="input-video" placeholder="Pega el link de Drive o YouTube aquí...">
+                    <input type="text" id="vid-titulo" class="input-video" placeholder="Título (ej. Viaje a la playa)">
+                </div>
+                <div class="inputs-grid" style="grid-template-columns: 1fr 2fr;">
+                    <select id="vid-categoria" class="select-video">
+                        <option value="recuerdos">Recuerdos</option>
+                        <option value="graciosos">Graciosos</option>
+                        <option value="mensajes">Mensajes</option>
+                    </select>
+                    <button class="btn-agregar-vid" onclick="agregarVideoDesdePanel()">Guardar Video en la Página ✨</button>
+                </div>
+            </div>
+
             <div class="filtros-videos">
-                <button class="btn-filtro activo" onclick="filtrarVideos('todos')">Todos</button>
-                <button class="btn-filtro" onclick="filtrarVideos('recuerdos')">Recuerdos</button>
-                <button class="btn-filtro" onclick="filtrarVideos('graciosos')">Graciosos</button>
-                <button class="btn-filtro" onclick="filtrarVideos('mensajes')">Mensajes</button>
+                <button class="btn-filtro activo" onclick="filtrarVideos('todos', this)">Todos</button>
+                <button class="btn-filtro" onclick="filtrarVideos('recuerdos', this)">Recuerdos</button>
+                <button class="btn-filtro" onclick="filtrarVideos('graciosos', this)">Graciosos</button>
+                <button class="btn-filtro" onclick="filtrarVideos('mensajes', this)">Mensajes</button>
             </div>
 
             <div class="grid-videos" id="catalogo-videos">
-                
-                <div class="video-item recuerdos">
-                    <div class="contenedor-iframe">
-                        <iframe src="LINK_DE_DRIVE_AQUI" allow="autoplay" allowfullscreen></iframe>
-                    </div>
-                    <div class="video-titulo">Nuestro primer viaje ✈️</div>
                 </div>
-
-                <div class="video-item recuerdos">
-                    <div class="contenedor-iframe">
-                        <iframe src="LINK_DE_DRIVE_AQUI" allow="autoplay" allowfullscreen></iframe>
-                    </div>
-                    <div class="video-titulo">Aquel día especial ✨</div>
-                </div>
-
-                <div class="video-item graciosos">
-                    <div class="contenedor-iframe">
-                        <iframe src="LINK_DE_YOUTUBE_AQUI" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                    </div>
-                    <div class="video-titulo">Cuando te caíste 😂</div>
-                </div>
-
-                <div class="video-item mensajes">
-                    <div class="contenedor-iframe">
-                        <iframe src="LINK_DE_DRIVE_AQUI" allow="autoplay" allowfullscreen></iframe>
-                    </div>
-                    <div class="video-titulo">Un mensaje para ti 💌</div>
-                </div>
-
-            </div>
         </section>
 
         <section class="seccion-sobres">
             <h3>Tus Regalitos Especiales</h3>
             <div class="grid-sobres">
-                
                 <div class="sobre-container" id="box-s1">
                     <img src="sobre-cerrado.png" id="img-s1" class="img-sobre" onclick="clickSobre(1)">
                     <button id="btn-s1" class="btn-canjear" onclick="canjearAccion(1)">Canjear</button>
@@ -305,7 +324,6 @@
                     <button id="btn-s3" class="btn-canjear" onclick="canjearAccion(3)">Canjear</button>
                     <div id="sello-s3" class="sello-canjeado">CANJEADO</div>
                 </div>
-
             </div>
         </section>
     </div>
@@ -339,7 +357,14 @@
         const BIN_ID = '6a4735a8f5f4af5e2957b86a';
         const API_KEY = '$2a$10$af69JbqOa6Kyd.O5qi70M.HHnHGjLK/lttwvA91sPhi2tCd6qIEVW';
 
-        let baseSobresCloud = { sobre1: false, sobre2: false, sobre3: false };
+        // Base de datos en la nube (Sobres y Videos)
+        let baseDatosCloud = {
+            sobre1: false, sobre2: false, sobre3: false,
+            videos: [
+                { url: "https://www.youtube.com/embed/jfKfPfyJRdk", titulo: "Cuando te caíste 😂", categoria: "graciosos" }
+            ]
+        };
+
         let fotosActivas = [];
         let indexFotoActual = 0;
 
@@ -349,13 +374,18 @@
             3: { txt: "¡Cupón Especial!<br>Este cupón te dará una comidita en Qué Chuzo! 🌭", img: "cupon-chuzo.jpg" }
         };
 
+        // --- SISTEMA DE LOGIN Y MÚSICA ---
         function procesarLogin() {
             let userField = document.getElementById('usuario').value.trim();
             let passField = document.getElementById('contrasena').value.trim();
 
             if (userField === "Ivanna" && passField === "aniversario 4") {
                 document.getElementById('msg-error').style.display = 'none';
-                document.getElementById('musica-fondo').play().catch(e => console.log("Audio listo"));
+                
+                let audio = document.getElementById('musica-fondo');
+                audio.volume = 0.4;
+                audio.play().catch(e => console.log("Audio listo"));
+                document.getElementById('control-musica').style.display = 'flex';
 
                 setTimeout(() => {
                     document.getElementById('login-caja').classList.add('caja-sube');
@@ -374,17 +404,56 @@
             }
         }
 
+        function toggleMusica() {
+            let audio = document.getElementById('musica-fondo');
+            let btn = document.getElementById('btn-play-pause');
+            if (audio.paused) {
+                audio.play();
+                btn.innerText = "⏸️";
+            } else {
+                audio.pause();
+                btn.innerText = "▶️";
+            }
+        }
+
+        function cambiarVolumen() {
+            let slider = document.getElementById('slider-vol');
+            let audio = document.getElementById('musica-fondo');
+            audio.volume = slider.value / 100;
+            document.getElementById('texto-vol').innerText = slider.value + '%';
+        }
+
+        // --- CONEXIÓN CON LA NUBE (JSONBIN) ---
         async function conectarNubeDescargar() {
             try {
                 let respuesta = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
                 let parseo = await respuesta.json();
-                if (parseo.record) { baseSobresCloud = parseo.record; pintarEstadosSobres(); }
-            } catch (e) { console.error("Fallo:", e); }
+                if (parseo.record) {
+                    baseDatosCloud = parseo.record;
+                    if (!baseDatosCloud.videos) baseDatosCloud.videos = [];
+                    pintarEstadosSobres();
+                    renderizarVideos();
+                }
+            } catch (e) {
+                console.error("Fallo de red, cargando datos locales:", e);
+                renderizarVideos();
+            }
         }
 
+        async function guardarEnNube() {
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+                    body: JSON.stringify(baseDatosCloud)
+                });
+            } catch (e) { console.error("Error guardando en nube:", e); }
+        }
+
+        // --- MANEJO DE SOBRES ---
         function pintarEstadosSobres() {
             for (let i = 1; i <= 3; i++) {
-                if (baseSobresCloud["sobre" + i] === true) {
+                if (baseDatosCloud["sobre" + i] === true) {
                     let imagenS = document.getElementById(`img-s${i}`);
                     imagenS.src = `sobre-abierto-${i}.png`;
                     imagenS.style.animation = 'none'; imagenS.onclick = null;
@@ -398,18 +467,97 @@
             let imagenS = document.getElementById(`img-s${idSobre}`);
             imagenS.src = `sobre-abierto-${idSobre}.png`;
             imagenS.style.animation = 'none';
-            if (!baseSobresCloud["sobre" + idSobre]) document.getElementById(`btn-s${idSobre}`).style.display = 'inline-block';
+            if (!baseDatosCloud["sobre" + idSobre]) document.getElementById(`btn-s${idSobre}`).style.display = 'inline-block';
             desplegarModalCupon(idSobre);
         }
 
-        async function canjearAccion(idSobre) {
+        function canjearAccion(idSobre) {
             document.getElementById(`btn-s${idSobre}`).style.display = 'none';
             document.getElementById(`sello-s${idSobre}`).style.display = 'block';
             document.getElementById(`img-s${idSobre}`).onclick = null;
-            baseSobresCloud["sobre" + idSobre] = true;
-            try { await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY }, body: JSON.stringify(baseSobresCloud) }); } catch (e) {}
+            baseDatosCloud["sobre" + idSobre] = true;
+            guardarEnNube();
         }
 
+        // --- SISTEMA INTELIGENTE DE VIDEOS ---
+        function agregarVideoDesdePanel() {
+            let urlRaw = document.getElementById('vid-url').value.trim();
+            let titulo = document.getElementById('vid-titulo').value.trim();
+            let categoria = document.getElementById('vid-categoria').value;
+
+            if (!urlRaw || !titulo) {
+                alert("Por favor pon un link y un título para el video ❤️");
+                return;
+            }
+
+            let urlConvertida = urlRaw;
+            
+            // Convertidor mágico para links de Google Drive
+            if (urlRaw.includes("drive.google.com")) {
+                let idMatch = urlRaw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                if (idMatch && idMatch[1]) {
+                    urlConvertida = `https://drive.google.com/file/d/${idMatch[1]}/preview`;
+                } else {
+                    urlConvertida = urlRaw.replace(/\/view.*|\/edit.*|\/sharing.*/, "/preview");
+                }
+            } 
+            // Convertidor mágico para links normales de YouTube
+            else if (urlRaw.includes("youtube.com/watch?v=") || urlRaw.includes("youtu.be/")) {
+                let vidId = urlRaw.split("v=")[1] || urlRaw.split("youtu.be/")[1];
+                if (vidId) {
+                    vidId = vidId.split("&")[0].split("?")[0];
+                    urlConvertida = `https://www.youtube.com/embed/${vidId}`;
+                }
+            }
+
+            baseDatosCloud.videos.push({ url: urlConvertida, titulo: titulo, categoria: categoria });
+            
+            // Limpiar campos
+            document.getElementById('vid-url').value = "";
+            document.getElementById('vid-titulo').value = "";
+
+            renderizarVideos();
+            guardarEnNube();
+            alert("¡Video guardado en la página con éxito! ✨");
+        }
+
+        function renderizarVideos() {
+            let catalogo = document.getElementById('catalogo-videos');
+            catalogo.innerHTML = "";
+
+            baseDatosCloud.videos.forEach(vid => {
+                let div = document.createElement('div');
+                div.className = `video-item ${vid.categoria}`;
+                div.innerHTML = `
+                    <div class="contenedor-iframe">
+                        <iframe src="${vid.url}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-titulo">${vid.titulo}</div>
+                `;
+                catalogo.appendChild(div);
+            });
+            
+            // Re-aplicar filtro actual
+            let btnActivo = document.querySelector('.btn-filtro.activo');
+            if (btnActivo) btnActivo.click();
+        }
+
+        function filtrarVideos(categoria, botonClickeado) {
+            if (botonClickeado) {
+                document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('activo'));
+                botonClickeado.classList.add('activo');
+            }
+            
+            document.querySelectorAll('.video-item').forEach(video => {
+                if (categoria === 'todos' || video.classList.contains(categoria)) {
+                    video.style.display = 'block';
+                } else {
+                    video.style.display = 'none';
+                }
+            });
+        }
+
+        // --- MODALES Y GALERÍA ---
         function abrirFotoUnica(rutaImagen) {
             fotosActivas = [rutaImagen]; indexFotoActual = 0;
             ocultarTodosLosModales();
@@ -451,33 +599,14 @@
             document.getElementById('modal-sistema').classList.add('modal-activo');
         }
 
-        // --- NUEVO: FUNCIÓN ABRIR AJEDREZ ---
         function abrirModalAjedrez() {
             ocultarTodosLosModales();
-            // Pausar música romántica para que no choque con la música del ajedrez
-            let musica = document.getElementById('musica-fondo');
-            if(musica) musica.pause();
+            let audio = document.getElementById('musica-fondo');
+            if(audio) audio.pause();
+            document.getElementById('btn-play-pause').innerText = "▶️";
 
             document.getElementById('modal-ajedrez-contenido').style.display = 'flex';
             document.getElementById('modal-sistema').classList.add('modal-activo');
-        }
-
-        // --- NUEVO: FUNCIÓN DE FILTRAR VIDEOS ---
-        function filtrarVideos(categoria) {
-            // Actualizar botones visuales
-            let botones = document.querySelectorAll('.btn-filtro');
-            botones.forEach(btn => btn.classList.remove('activo'));
-            event.target.classList.add('activo');
-
-            // Filtrar los videos
-            let videos = document.querySelectorAll('.video-item');
-            videos.forEach(video => {
-                if (categoria === 'todos' || video.classList.contains(categoria)) {
-                    video.style.display = 'block';
-                } else {
-                    video.style.display = 'none';
-                }
-            });
         }
 
         function ocultarTodosLosModales() {
@@ -495,10 +624,12 @@
         function forzarCierreModal() {
             document.getElementById('modal-sistema').classList.remove('modal-activo');
             
-            // Si el ajedrez estaba abierto, volver a reproducir la música romántica al cerrarlo
             if (document.getElementById('modal-ajedrez-contenido').style.display === 'flex') {
-                let musica = document.getElementById('musica-fondo');
-                if(musica) musica.play().catch(e=>{});
+                let audio = document.getElementById('musica-fondo');
+                if(audio) {
+                    audio.play().catch(e=>{});
+                    document.getElementById('btn-play-pause').innerText = "⏸️";
+                }
             }
             ocultarTodosLosModales();
         }
