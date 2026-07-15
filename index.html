@@ -1,694 +1,638 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ajedrez En Linea</title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Aniversario Amor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- PALETA DE COLORES COZY --- */
+        :root {
+            --fondo-principal: #fce4ec; 
+            --texto-titulos: #880e4f; 
+            --texto-parrafos: #4a148c; 
+            --fondo-cartas: #fdf2f6; 
+            --azul-pastel: #bbdefb; 
+            --sombra: rgba(136, 14, 79, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Quicksand', sans-serif; background-color: var(--fondo-principal); overflow-x: hidden; }
+
+        /* --- REPRODUCTOR Y BARRA DE MÚSICA ESTILO AJEDREZ --- */
+        #musica-fondo { display: none; }
+        
+        #control-musica {
+            position: fixed; top: 20px; right: 20px;
+            background: var(--fondo-cartas); border: 2.5px solid var(--texto-titulos);
+            padding: 8px 16px; border-radius: 30px; box-shadow: 0 5px 20px var(--sombra);
+            display: none; align-items: center; gap: 12px; z-index: 4000;
+            transition: transform 0.3s;
+        }
+        #control-musica:hover { transform: scale(1.03); }
+        .btn-musica { background: var(--azul-pastel); border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+        .vol-slider { width: 70px; accent-color: var(--texto-titulos); cursor: pointer; }
+        .vol-texto { font-weight: bold; color: var(--texto-parrafos); font-size: 13px; min-width: 35px; }
+
+        /* --- PANTALLA DE INICIO DE SESIÓN --- */
+        #pantalla-login {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 5000; display: flex; justify-content: center; align-items: center;
+        }
+        #login-fondo {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--fondo-principal);
+            background-image: radial-gradient(var(--azul-pastel) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        #login-caja {
+            position: relative; background: var(--fondo-cartas); padding: 45px;
+            border-radius: 24px; box-shadow: 0 12px 40px var(--sombra);
+            text-align: center; border: 3px dashed var(--texto-titulos); width: 90%; max-width: 400px;
+            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        #login-caja h2 { color: var(--texto-titulos); font-family: 'Caveat', cursive; font-size: 42px; margin-bottom: 25px; }
+        .input-login { display: block; width: 100%; padding: 14px; margin-bottom: 18px; border: 2.5px solid var(--azul-pastel); border-radius: 12px; font-size: 16px; outline: none; font-family: inherit; text-align: center; color: var(--texto-titulos); font-weight: 600; }
+        .btn-login { background-color: var(--texto-titulos); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 18px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        .btn-login:hover { background-color: #6a053c; transform: translateY(-2px); }
+        #msg-error { color: #d32f2f; margin-top: 12px; font-weight: bold; font-size: 14px; display: none; }
+
+        .fondo-baja { transform: translateY(100vh); }
+        .caja-sube { transform: translateY(-100vh); }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        #contenido-principal {
+            opacity: 0; transform: scale(0.3);
+            transition: transform 1.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 1.4s ease;
+            padding-bottom: 120px; display: none;
+        }
+        .contenido-crece { opacity: 1 !important; transform: scale(1) !important; }
+
+        .mascota-esquina {
+            position: fixed; bottom: 25px; right: 25px; width: 110px; height: auto;
+            z-index: 1000; pointer-events: none;
+            animation: rebote-infinito 3.5s ease-in-out infinite;
+        }
+        @keyframes rebote-infinito {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-25px); }
+        }
+
+        header { text-align: center; padding: 80px 20px 40px; }
+        header h1 { font-family: 'Caveat', cursive; font-size: 65px; color: var(--texto-titulos); margin-bottom: 5px; }
+        header h2 { font-size: 24px; color: var(--texto-parrafos); background-color: var(--azul-pastel); display: inline-block; padding: 8px 28px; border-radius: 30px; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        /* --- 1. ÁLBUM DE RECUERDOS --- */
+        .contenedor-recuerdos { max-width: 950px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 65px; }
+        .bloque-recuerdo { display: flex; align-items: center; justify-content: space-between; gap: 40px; background-color: var(--fondo-cartas); padding: 35px; border-radius: 24px; box-shadow: 0 10px 30px var(--sombra); }
+        .bloque-recuerdo:nth-child(even) { flex-direction: row-reverse; }
+        .texto-carta { flex: 1; font-family: 'Caveat', cursive; font-size: 32px; line-height: 1.4; color: var(--texto-titulos); }
+        .nota-pie { display: block; margin-top: 15px; font-family: 'Quicksand', sans-serif; font-size: 16px; font-weight: 600; color: var(--texto-parrafos); font-style: italic; }
+        
+        .polaroid { background: #fffdfd; padding: 16px 16px 45px 16px; box-shadow: 3px 8px 22px rgba(136, 14, 79, 0.15); border-radius: 4px; cursor: pointer; transition: transform 0.3s ease; }
+        .bloque-recuerdo:nth-child(1) .polaroid { transform: rotate(-3deg); }
+        .bloque-recuerdo:nth-child(2) .polaroid { transform: rotate(4deg); }
+        .bloque-recuerdo:nth-child(3) .polaroid { transform: rotate(-4deg); }
+        .bloque-recuerdo:nth-child(4) .polaroid { transform: rotate(3deg); }
+        .polaroid:hover { transform: scale(1.06) rotate(0deg) !important; }
+        .polaroid img { width: 260px; height: 260px; object-fit: cover; border-radius: 2px; display: block; }
+
+        /* --- 2. ZONA DE JUEGO (AJEDREZ) --- */
+        .zona-juego { text-align: center; margin-top: 80px; padding: 20px; }
+        .zona-juego h3 { font-family: 'Caveat', cursive; font-size: 48px; color: var(--texto-titulos); margin-bottom: 25px; }
+        .caja-juego { background: var(--fondo-cartas); border: 3px dashed var(--texto-titulos); padding: 40px; border-radius: 24px; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 30px var(--sombra); }
+        .caja-juego p { font-size: 18px; color: var(--texto-parrafos); margin-bottom: 25px; font-weight: 600; }
+        .btn-juego { background-color: var(--texto-titulos); color: white; padding: 15px 35px; font-size: 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: transform 0.2s; box-shadow: 0 4px 15px var(--sombra); }
+        .btn-juego:hover { transform: scale(1.05); }
+
+        /* --- 3. SECCIÓN VIDEOS CON PANEL AGREGADOR --- */
+        .seccion-videos { text-align: center; margin-top: 80px; padding: 20px; max-width: 1000px; margin-left: auto; margin-right: auto; }
+        .seccion-videos h3 { font-family: 'Caveat', cursive; font-size: 48px; color: var(--texto-titulos); margin-bottom: 20px; }
+        
+        /* Panel para agregar videos */
+        .panel-agregar-video {
+            background: var(--fondo-cartas); border: 2.5px solid var(--azul-pastel);
+            padding: 25px; border-radius: 20px; max-width: 700px; margin: 0 auto 40px auto;
+            box-shadow: 0 8px 25px var(--sombra); text-align: left;
+        }
+        .panel-agregar-video h4 { color: var(--texto-titulos); margin-bottom: 15px; font-size: 18px; text-align: center; }
+        .inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .input-video { width: 100%; padding: 12px; border: 2px solid var(--azul-pastel); border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; }
+        .select-video { width: 100%; padding: 12px; border: 2px solid var(--azul-pastel); border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; background: white; color: var(--texto-parrafos); font-weight: bold; }
+        .btn-agregar-vid { background: var(--texto-titulos); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; transition: 0.3s; }
+        .btn-agregar-vid:hover { background: #6a053c; }
+
+        /* Filtros y Catálogo */
+        .filtros-videos { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .btn-filtro { background: var(--azul-pastel); color: var(--texto-parrafos); border: 2px solid var(--texto-parrafos); padding: 10px 24px; border-radius: 20px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .btn-filtro:hover, .btn-filtro.activo { background: var(--texto-titulos); color: white; border-color: var(--texto-titulos); }
+        
+        .grid-videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .video-item { background: var(--fondo-cartas); padding: 15px; border-radius: 16px; box-shadow: 0 8px 25px var(--sombra); transition: transform 0.3s; position: relative; }
+        .video-item:hover { transform: translateY(-5px); }
+        .contenedor-iframe { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: #000; }
+        .contenedor-iframe iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .video-titulo { font-family: 'Quicksand', sans-serif; font-weight: bold; color: var(--texto-parrafos); margin-top: 15px; font-size: 16px; }
+
+        /* --- 4. SECCIÓN REGALOS (SOBRES) --- */
+        .seccion-sobres { text-align: center; margin-top: 80px; padding: 20px; }
+        .seccion-sobres h3 { font-family: 'Caveat', cursive; font-size: 48px; color: var(--texto-titulos); margin-bottom: 40px; }
+        .grid-sobres { display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; }
+        .sobre-container { position: relative; display: flex; flex-direction: column; align-items: center; gap: 15px; width: 180px; }
+        .img-sobre { width: 150px; height: auto; cursor: pointer; transition: transform 0.2s; }
+        .img-sobre:hover { animation: rebote-sobre 0.4s infinite alternate ease-in-out; }
+        @keyframes rebote-sobre { 0% { transform: translateY(0); } 100% { transform: translateY(-12px); } }
+        .btn-canjear { background-color: var(--azul-pastel); color: var(--texto-parrafos); font-weight: 700; border: 2.5px solid var(--texto-parrafos); padding: 10px 24px; border-radius: 12px; cursor: pointer; display: none; font-size: 15px; transition: transform 0.2s; }
+        .btn-canjear:hover { transform: scale(1.1); }
+        .sello-canjeado {
+            position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%) rotate(-18deg);
+            color: #ff1744; border: 4px solid #ff1744; font-weight: bold; font-size: 22px;
+            padding: 6px 14px; border-radius: 8px; letter-spacing: 2px; z-index: 20;
+            background: rgba(253, 242, 246, 0.95); box-shadow: 0 4px 15px rgba(255,23,68,0.25);
+            display: none; pointer-events: none;
+        }
+
+        /* --- VENTANAS MODALES --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(136, 14, 79, 0.65); backdrop-filter: blur(5px);
+            z-index: 10000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        }
+        .modal-activo { opacity: 1; pointer-events: auto; }
+        
+        .galeria-box { position: relative; max-width: 500px; width: 90%; text-align: center; }
+        .galeria-box img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 16px; border: 6px solid #fffdfd; box-shadow: 0 10px 35px rgba(0,0,0,0.3); }
+        .flecha { position: absolute; top: 50%; transform: translateY(-50%); background: var(--fondo-cartas); border: 2.5px solid var(--texto-titulos); color: var(--texto-titulos); width: 45px; height: 45px; border-radius: 50%; font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; transition: 0.2s; }
+        .flecha:hover { background: var(--azul-pastel); }
+        .flecha-izq { left: -25px; } .flecha-der { right: -25px; }
+        .txt-galeria-info { color: #fffdfd; font-weight: bold; margin-top: 12px; font-size: 18px; text-shadow: 1px 1px 4px rgba(0,0,0,0.5); }
+
+        .cupon-box { background: repeating-linear-gradient(45deg, var(--azul-pastel), var(--azul-pastel) 12px, var(--fondo-cartas) 12px, var(--fondo-cartas) 24px); padding: 12px; border-radius: 24px; max-width: 550px; width: 90%; box-shadow: 0 15px 40px rgba(0,0,0,0.3); animation: popCupon 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popCupon { 0% { transform: scale(0.7); } 100% { transform: scale(1); } }
+        .cupon-interior { display: flex; align-items: center; background-color: var(--fondo-cartas); border: 3px dashed var(--texto-titulos); border-radius: 16px; padding: 25px; gap: 25px; position: relative; }
+        .cupon-img-circular { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--texto-titulos); flex-shrink: 0; }
+        .cupon-texto { font-size: 22px; font-weight: 700; color: var(--texto-titulos); text-align: left; line-height: 1.4; }
+        
+        .ajedrez-box { width: 95vw; max-width: 1200px; height: 90vh; background: var(--fondo-principal); border-radius: 16px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .ajedrez-box iframe { flex: 1; width: 100%; height: 100%; border: none; border-radius: 16px; }
+        
+        .btn-cerrar-modal { position: absolute; top: -15px; right: -15px; background: #d32f2f; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 18px; z-index: 500; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        @media (max-width: 768px) {
+            .bloque-recuerdo, .bloque-recuerdo:nth-child(even) { flex-direction: column; text-align: center; padding: 25px; }
+            .cupon-interior { flex-direction: column; text-align: center; padding: 20px; }
+            .cupon-texto { text-align: center; font-size: 19px; }
+            .mascota-esquina { width: 85px; }
+            header h1 { font-size: 48px; }
+            .flecha-izq { left: -10px; } .flecha-der { right: -10px; }
+            .ajedrez-box { height: 85vh; }
+            .inputs-grid { grid-template-columns: 1fr; }
+            #control-musica { top: 10px; right: 10px; padding: 6px 12px; }
+        }
+    </style>
 </head>
-<body class="theme-default">
+<body>
 
-  <!-- REPRODUCTOR DE MÚSICA DE FONDO -->
-  <audio id="audio-fondo" loop>
-    <source src="musica-default.mp3" type="audio/mpeg">
-  </audio>
+    <audio id="musica-fondo" loop>
+        <source src="cancion.mp3" type="audio/mpeg">
+    </audio>
 
-  <!-- CONTROL DE VOLUMEN FLOTANTE EN LA ESQUINA -->
-  <div id="control-volumen">
-    🔊
-    <input type="range" id="vol-slider" min="0" max="100" step="10" value="20" onchange="cambiarVolumen()" oninput="cambiarVolumen()">
-    <span id="vol-text">20%</span>
-  </div>
-
-  <header>
-    <div class="header-titulo">AJEDREZ EN LINEA</div>
-  </header>
-
-  <!-- PANTALLA DE BIENVENIDA -->
-  <div id="modal-inicio" class="modal-overlay">
-    <div class="modal-box" style="background: transparent; border: none; box-shadow: none;">
-      <h1 style="font-size: 40px; margin-bottom: 10px; text-shadow: 2px 2px 4px #000; color: white;">BIENVENIDOS AL AJEDREZ EN LINEA</h1>
-      <p style="font-size: 18px; margin-bottom: 30px; text-shadow: 1px 1px 2px #000; color: white;">Demuestra tu destreza estrategica.</p>
-      <button class="btn-success" style="font-size: 24px; padding: 15px 40px;" onclick="cerrarBienvenida()">SIGUIENTE</button>
-    </div>
-  </div>
-
-  <!-- MODALES DE RESULTADOS -->
-  <div id="modal-victoria" class="modal-overlay oculto">
-    <div class="modal-box">
-      <h1 style="color: #ffc107; font-size: 36px; margin-bottom: 20px;">VICTORIA</h1>
-      <p id="msg-victoria" style="margin-bottom: 20px; font-size: 18px;"></p>
-      <button class="btn-primary" onclick="cerrarYReiniciar()">CONTINUAR</button>
-    </div>
-  </div>
-  <div id="modal-derrota" class="modal-overlay oculto">
-    <div class="modal-box">
-      <h1 style="color: #dc3545; font-size: 36px; margin-bottom: 20px;">DERROTA</h1>
-      <p style="margin-bottom: 20px; font-size: 18px;">Tu rey ha sido derrotado. Intentalo de nuevo.</p>
-      <button class="btn-primary" onclick="cerrarYReiniciar()">INTENTAR DE NUEVO</button>
-    </div>
-  </div>
-  <div id="modal-empate" class="modal-overlay oculto">
-    <div class="modal-box">
-      <h1 style="color: #17a2b8; font-size: 36px; margin-bottom: 20px;">EMPATE</h1>
-      <p id="msg-empate" style="margin-bottom: 20px; font-size: 18px;"></p>
-      <button class="btn-primary" onclick="cerrarYReiniciar()">NUEVA PARTIDA</button>
-    </div>
-  </div>
-
-  <div id="modal-coronacion" class="modal-overlay oculto">
-    <div class="modal-box">
-      <h2>Elige tu pieza:</h2>
-      <div style="display:flex; gap:15px; justify-content:center; margin-top:20px;">
-        <button class="btn-corona" data-pieza="q" style="background:none; border:none; cursor:pointer;"><img id="img-corona-q" style="height:60px;"></button>
-        <button class="btn-corona" data-pieza="r" style="background:none; border:none; cursor:pointer;"><img id="img-corona-r" style="height:60px;"></button>
-        <button class="btn-corona" data-pieza="b" style="background:none; border:none; cursor:pointer;"><img id="img-corona-b" style="height:60px;"></button>
-        <button class="btn-corona" data-pieza="n" style="background:none; border:none; cursor:pointer;"><img id="img-corona-n" style="height:60px;"></button>
-      </div>
-    </div>
-  </div>
-
-  <div class="main-wrapper">
-    
-    <!-- PANEL IZQUIERDO -->
-    <div class="panel">
-      <div class="seccion-scroll">
-        <h3>Oponentes</h3>
-        <div class="lista-scroll" id="lista-bots"></div>
-      </div>
-      
-      <div class="seccion-scroll">
-        <h3>Cementerio</h3>
-        <div id="cementerio" class="lista-scroll cementerio-grid"></div>
-      </div>
+    <div id="control-musica">
+        <button class="btn-musica" id="btn-play-pause" onclick="toggleMusica()">⏸️</button>
+        <input type="range" class="vol-slider" id="slider-vol" min="0" max="100" value="40" oninput="cambiarVolumen()">
+        <span class="vol-texto" id="texto-vol">40%</span>
     </div>
 
-    <!-- CENTRO: TABLERO Y CONTROLES -->
-    <div class="content">
-      <div class="tablero">
-        <div class="ajedrez" id="tablero-rejilla"></div>
-      </div>
-
-      <div class="controles-tablero" id="area-botones" style="margin-top: 10px;">
-        <button class="btn-success" id="btn-jugar" style="font-size: 18px; padding: 12px 40px;" onclick="empezarJuego()">¡JUGAR AHORA!</button>
-        <button class="btn-primary oculto" id="btn-equipo" onclick="cambiarEquipo()">Cambiar Equipo (B/N)</button>
-        <button class="btn-danger oculto" id="btn-reiniciar" onclick="reiniciarPartidaManual()">Reiniciar Tablero</button>
-      </div>
+    <div id="pantalla-login">
+        <div id="login-fondo"></div>
+        <div id="login-caja">
+            <h2>Solo para Ivanna ❤️</h2>
+            <input type="text" id="usuario" class="input-login" placeholder="Usuario">
+            <input type="password" id="contrasena" class="input-login" placeholder="Contraseña">
+            <button class="btn-login" onclick="procesarLogin()">Entrar</button>
+            <p id="msg-error">Datos incorrectos amor</p>
+        </div>
     </div>
 
-    <!-- PANEL DERECHO CON GUÍA FLOTANTE A SU LADO -->
-    <div class="panel" style="position: relative;">
-      
-      <!-- Temas -->
-      <div class="seccion-scroll" style="flex: 0 0 40%;">
-        <h3>Temas Visuales</h3>
-        <div class="lista-scroll" id="lista-temas"></div>
-      </div>
-
-      <!-- Historial -->
-      <div class="seccion-scroll" style="flex: 1 1 auto;">
-        <h3>Registro de Jugadas</h3>
-        <div class="lista-scroll" id="historial"></div>
-      </div>
-
-      <!-- GUÍA INTEGRADA AL ESCENARIO (Cajas individuales) -->
-      <div id="guia-flotante-derecha"></div>
-
-    </div>
-
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-  <script>
-    const BOTS = [
-        { id: 1, nombre: "Abel", diff: 1 },
-        { id: 2, nombre: "Canelita", diff: 3 },
-        { id: 3, nombre: "Bugs Bunny", diff: 6 }, 
-        { id: 4, nombre: "Luigi", diff: 8 },
-        { id: 5, nombre: "Warden", diff: 10 },
-        { id: 6, nombre: "Dr. Zomboss", diff: 12 },
-        { id: 7, nombre: "Anonymous", diff: 15 }
-    ];
-
-    const TEMAS = [
-        { id: 'default', nombre: "Clásico" },
-        { id: 'cozy', nombre: "Cozy" },
-        { id: 'oscuro', nombre: "Elegante" },
-        { id: 'tema4', nombre: "Mario Bros" },
-        { id: 'tema5', nombre: "Minecraft" },
-        { id: 'tema6', nombre: "Plantas vs Zombies" },
-        { id: 'tema7', nombre: "Hacker" },
-        { id: 'tema8', nombre: "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" }
-    ];
-
-    let juegoIniciado = false;
-    let equipoJugador = 'w'; 
-    let botActual = 1; 
-    let botPensando = false;
-    let movimientoPendiente = null;
-    let temaActual = 'default'; 
-    let piezasCapturadas = []; 
-    
-    const juego = new Chess();
-    const tableroHTML = document.getElementById('tablero-rejilla');
-    const historialDiv = document.getElementById('historial');
-
-    const sonidoMover = new Audio('mover-default.mp3');
-    const sonidoCaptura = new Audio('captura-default.mp3');
-    const sonidoCapturaBlanca = new Audio('captura-blanca-default.mp3'); 
-    const sonidoJaque = new Audio('jaque-default.mp3');
-    const sonidoSplash = new Audio('splash-tema6.mp3'); 
-
-    sonidoMover.volume = 0.5;   
-    sonidoCaptura.volume = 0.5;
-    sonidoCapturaBlanca.volume = 0.5;
-    sonidoJaque.volume = 0.5;
-    sonidoSplash.volume = 0.6; 
-
-    function getArchivoPieza(letraPieza, colorIngles) {
-        if (!letraPieza) return "";
-        let prefijo = (temaActual === 'default' || temaActual === 'oscuro' || temaActual === 'tema8') ? '' : `${temaActual}-`;
+    <div id="contenido-principal">
         
-        if (colorIngles === 'w') {
-            const blancas = { p: 'peon-blanco.png', n: 'caballo-blanco.png', b: 'alfil-blanco.png', r: 'torre-blanca.png', q: 'reina-blanca.png', k: 'rey-blanco.png' };
-            return prefijo + blancas[letraPieza];
-        } else {
-            const negras = { p: 'peon-negro.png', n: 'caballo-negro.png', b: 'alfil-negro.png', r: 'torre-negra.png', q: 'reina-negra.png', k: 'rey-negro.png' };
-            return prefijo + negras[letraPieza];
-        }
-    }
+        <img src="mascota-animada.png" class="mascota-esquina" alt="Mascota">
 
-    function renderGuiaPiezas() {
-        const piezasInfo = [
-            { tipo: 'p', nombre: 'Peón' },
-            { tipo: 'n', nombre: 'Caballo' },
-            { tipo: 'b', nombre: 'Alfil' },
-            { tipo: 'r', nombre: 'Torre' },
-            { tipo: 'q', nombre: 'Reina' },
-            { tipo: 'k', nombre: 'Rey' }
-        ];
-        let html = '';
-        piezasInfo.forEach(p => {
-            html += `
-            <div class="guia-item-transparente">
-                <div class="guia-imgs-transparente">
-                    <img src="${getArchivoPieza(p.tipo, 'w')}">
-                    <img src="${getArchivoPieza(p.tipo, 'b')}">
+        <header>
+            <h1>¡Feliz aniversario N° 4!</h1>
+            <h2>04/07/2026</h2>
+        </header>
+
+        <main class="contenedor-recuerdos">
+            <div class="bloque-recuerdo">
+                <div class="texto-carta">
+                    "Desde que llegaste a mi vida todo ha cambiado para mi, aun recuerdo ese hermoso dia que eramos desconocidos pero en el fondo estabamos destinados uno al otro"
+                    <span class="nota-pie">Nota: hace 4 años nunca me esperé que esa chica especial en mi vida ibas a ser tu</span>
                 </div>
-                <div class="guia-texto-transparente">${p.nombre}</div>
-            </div>`;
-        });
-        document.getElementById('guia-flotante-derecha').innerHTML = html;
-    }
+                <div class="polaroid" onclick="abrirFotoUnica('foto-carta1.jpg')">
+                    <img src="foto-carta1.jpg" alt="Nuestro Inicio">
+                </div>
+            </div>
 
-    function cambiarVolumen() {
-        let slider = document.getElementById('vol-slider');
-        let audioFondo = document.getElementById('audio-fondo');
-        audioFondo.volume = slider.value / 100; 
-        document.getElementById('vol-text').innerText = slider.value + '%';
-    }
+            <div class="bloque-recuerdo">
+                <div class="texto-carta">
+                    "Aunque viviste mucho tiempo en los estados unidos nunca dejé de amarte, nunca dejé de confiar en mi corazon, esos dias fueron duros pero al fin estas a mi lado uwu"
+                </div>
+                <div class="polaroid" onclick="abrirGaleria(['foto-carta2-1.jpg', 'foto-carta2-2.jpg', 'foto-carta2-3.jpg'])">
+                    <img src="foto-carta2-1.jpg" alt="Superando la Distancia">
+                </div>
+            </div>
 
-    window.onload = () => {
-        document.getElementById('vol-slider').value = 20;
-        cambiarVolumen(); 
-        renderBots();
-        renderTemas();
-        renderGuiaPiezas(); 
-        dibujarTableroVacio();
-    };
+            <div class="bloque-recuerdo">
+                <div class="texto-carta">
+                    "Adoré el dia que llegaste a mi vida despues de mucho tiempo, el dia que te vi por primera vez no me lo podia creer me sentia el hombre mas afortunado y feliz del mundo!"
+                    <span class="nota-pie">Ese hermoso dia fue muy especial para mi uwu</span>
+                </div>
+                <div class="polaroid" onclick="abrirGaleria(['foto-carta3-1.jpg', 'foto-carta3-2.jpg', 'foto-carta3-3.jpg'])">
+                    <img src="foto-carta3-1.jpg" alt="El Reencuentro">
+                </div>
+            </div>
 
-    function cerrarBienvenida() {
-        document.getElementById('modal-inicio').classList.add('oculto');
-        document.getElementById('audio-fondo').play().catch(e => console.log("Audio bloqueado"));
-    }
+            <div class="bloque-recuerdo">
+                <div class="texto-carta">
+                    "Aun sigo siendo el hombre mas afortunado y feliz de mi vida, me encanta todos los recuerdos que hemos estado armando juntos! me encanta cada dia que pasa y espero hacer muchos mas recuerdos juntos hoy mañana y siempre uwu te adoro!!"
+                </div>
+                <div class="polaroid" onclick="abrirGaleria(['foto-carta4-1.jpg', 'foto-carta4-2.jpg', 'foto-carta4-3.jpg', 'foto-carta4-4.jpg', 'foto-carta4-5.jpg'])">
+                    <img src="foto-carta4-1.jpg" alt="Nuestro Futuro">
+                </div>
+            </div>
+        </main>
 
-    function empezarJuego() {
-        document.getElementById('audio-fondo').play().catch(e => console.log("Audio bloqueado"));
-        document.getElementById('btn-jugar').classList.add('oculto');
-        document.getElementById('btn-equipo').classList.remove('oculto');
-        document.getElementById('btn-reiniciar').classList.remove('oculto');
+        <section class="zona-juego">
+            <h3>Zona de Juego</h3>
+            <div class="caja-juego">
+                <p>¿Recuerdas el juego que creé con tanto cariño? ¡Es hora de una partida!</p>
+                <button class="btn-juego" onclick="abrirModalAjedrez()">♟️ Jugar Ajedrez</button>
+            </div>
+        </section>
 
-        juegoIniciado = true;
-        piezasCapturadas = [];
-        renderCementerio();
-        juego.reset();
-        dibujarTablero(true); 
-    }
-
-    function renderBots() {
-        let html = '';
-        BOTS.forEach((b) => {
-            let clase = 'item-lista';
-            if(botActual === b.id) clase += ' activo';
+        <section class="seccion-videos">
+            <h3>Nuestros Videos</h3>
             
-            let estiloFondo = `
-                background: linear-gradient(to right, rgba(0, 0, 0, 0.65) 45%, rgba(0, 0, 0, 0) 100%), url('bot-${b.id}.png') right center / cover no-repeat;
-                color: #ffffff; 
-                border: 1px solid var(--borde);
-            `;
-
-            html += `
-            <div class="${clase}" style="${estiloFondo}" onclick="seleccionarBot(${b.id})">
-                <div class="item-info" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.8); position: relative; z-index: 2;">
-                    <strong>${b.nombre}</strong>
-                    <span style="font-size:12px; color: #eeeeee;">Dificultad: ${b.diff}</span>
+            <div class="panel-agregar-video">
+                <h4>➕ Agregar un nuevo video (Drive o YouTube)</h4>
+                <div class="inputs-grid">
+                    <input type="text" id="vid-url" class="input-video" placeholder="Pega el link de Drive o YouTube aquí...">
+                    <input type="text" id="vid-titulo" class="input-video" placeholder="Título (ej. Viaje a la playa)">
                 </div>
-            </div>`;
-        });
-        document.getElementById('lista-bots').innerHTML = html;
-    }
+                <div class="inputs-grid" style="grid-template-columns: 1fr 2fr;">
+                    <select id="vid-categoria" class="select-video">
+                        <option value="recuerdos">Recuerdos</option>
+                        <option value="graciosos">Graciosos</option>
+                        <option value="mensajes">Mensajes</option>
+                    </select>
+                    <button class="btn-agregar-vid" onclick="agregarVideoDesdePanel()">Guardar Video en la Página ✨</button>
+                </div>
+            </div>
 
-    function seleccionarBot(id) {
-        botActual = id;
-        renderBots();
-        if(juegoIniciado) {
-            piezasCapturadas = [];
-            renderCementerio();
-            juego.reset(); 
-            dibujarTablero(true); 
-            historialDiv.innerHTML='';
-        }
-    }
+            <div class="filtros-videos">
+                <button class="btn-filtro activo" onclick="filtrarVideos('todos', this)">Todos</button>
+                <button class="btn-filtro" onclick="filtrarVideos('recuerdos', this)">Recuerdos</button>
+                <button class="btn-filtro" onclick="filtrarVideos('graciosos', this)">Graciosos</button>
+                <button class="btn-filtro" onclick="filtrarVideos('mensajes', this)">Mensajes</button>
+            </div>
 
-    function registrarVictoria() {
-        document.getElementById('msg-victoria').innerText = "¡Excelente partida! Has derrotado a tu oponente.";
-    }
+            <div class="grid-videos" id="catalogo-videos">
+                </div>
+        </section>
 
-    function renderTemas() {
-        let html = '';
-        TEMAS.forEach((t) => {
-            let estilo = (temaActual === t.id) ? 'font-weight:bold; color:#ffc107; border-color:#ffc107;' : '';
-            html += `<div style="padding:5px 0; cursor:pointer; transition:0.3s; ${estilo}" 
-                          onclick="aplicarTema('${t.id}')">
-                        ${t.nombre}
-                     </div>`;
-        });
-        document.getElementById('lista-temas').innerHTML = html;
-    }
+        <section class="seccion-sobres">
+            <h3>Tus Regalitos Especiales</h3>
+            <div class="grid-sobres">
+                <div class="sobre-container" id="box-s1">
+                    <img src="sobre-cerrado.png" id="img-s1" class="img-sobre" onclick="clickSobre(1)">
+                    <button id="btn-s1" class="btn-canjear" onclick="canjearAccion(1)">Canjear</button>
+                    <div id="sello-s1" class="sello-canjeado">CANJEADO</div>
+                </div>
 
-    function aplicarTema(idTema) {
-        document.body.className = 'theme-' + idTema;
-        temaActual = idTema;
+                <div class="sobre-container" id="box-s2">
+                    <img src="sobre-cerrado.png" id="img-s2" class="img-sobre" onclick="clickSobre(2)">
+                    <button id="btn-s2" class="btn-canjear" onclick="canjearAccion(2)">Canjear</button>
+                    <div id="sello-s2" class="sello-canjeado">CANJEADO</div>
+                </div>
+
+                <div class="sobre-container" id="box-s3">
+                    <img src="sobre-cerrado.png" id="img-s3" class="img-sobre" onclick="clickSobre(3)">
+                    <button id="btn-s3" class="btn-canjear" onclick="canjearAccion(3)">Canjear</button>
+                    <div id="sello-s3" class="sello-canjeado">CANJEADO</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="modal-sistema" class="modal" onclick="cerrarCualquierModal(event)">
         
-        let audioFondo = document.getElementById('audio-fondo');
-        audioFondo.src = `musica-${idTema}.mp3`;
-        sonidoMover.src = `mover-${idTema}.mp3`;
-        sonidoCaptura.src = `captura-${idTema}.mp3`;
-        sonidoCapturaBlanca.src = `captura-blanca-${idTema}.mp3`; 
-        sonidoJaque.src = `jaque-${idTema}.mp3`;
-        
-        if(!document.getElementById('modal-inicio').classList.contains('oculto') === false) {
-            audioFondo.play().catch(e => console.log(e));
-        }
-        
-        if(juegoIniciado) {
-            dibujarTablero(false); 
-            renderCementerio();
-        } else {
-            dibujarTableroVacio();
-        }
-        
-        renderTemas();
-        renderGuiaPiezas(); 
-    }
+        <div id="modal-galeria-contenido" class="galeria-box" style="display:none;">
+            <button class="flecha flecha-izq" onclick="pasarFoto(-1)">‹</button>
+            <img id="img-target-galeria" src="" alt="Vista ampliada">
+            <button class="flecha flecha-der" onclick="pasarFoto(1)">›</button>
+            <p id="txt-contador" class="txt-galeria-info"></p>
+        </div>
 
-    function cambiarEquipo() {
-        if(!juegoIniciado) return;
-        equipoJugador = equipoJugador === 'w' ? 'b' : 'w';
-        piezasCapturadas = [];
-        renderCementerio();
-        juego.reset(); 
-        historialDiv.innerHTML='';
-        dibujarTablero(true);
-        if(equipoJugador === 'b') setTimeout(realizarMovimientoBot, 1000);
-    }
+        <div id="modal-cupon-contenido" class="cupon-box" style="display:none;" onclick="event.stopPropagation()">
+            <div class="cupon-interior">
+                <button class="btn-cerrar-modal" onclick="forzarCierreModal()">X</button>
+                <img id="cupon-img" src="" class="cupon-img-circular">
+                <div id="cupon-txt" class="cupon-texto"></div>
+            </div>
+        </div>
 
-    function reiniciarPartidaManual() {
-        if(!juegoIniciado) return;
-        juego.reset();
-        dibujarTablero(true);
-        historialDiv.innerHTML='';
-        piezasCapturadas = [];
-        renderCementerio();
-    }
+        <div id="modal-ajedrez-contenido" class="ajedrez-box" style="display:none;" onclick="event.stopPropagation()">
+            <button class="btn-cerrar-modal" onclick="forzarCierreModal()">X</button>
+            <iframe src="ajedrez.html" id="iframe-ajedrez"></iframe>
+        </div>
 
-    function dibujarTableroVacio() {
-        tableroHTML.innerHTML = "";
-        let cols = ['a','b','c','d','e','f','g','h'];
-        if(equipoJugador === 'b') cols.reverse();
-        
-        for (let i = 8; i >= 1; i--) {
-            let row = equipoJugador === 'w' ? i : 9 - i;
-            for (let j = 0; j < 8; j++) {
-                let colorClase = (row + j) % 2 !== 0 ? 'blanca' : 'negra';
-                if(equipoJugador==='b') colorClase = (row + j) % 2 === 0 ? 'blanca' : 'negra';
-                tableroHTML.innerHTML += `<div class="${colorClase}"></div>`;
+    </div>
+
+    <script>
+        // --- CREDENCIALES DE TU JSONBIN ---
+        const BIN_ID = '6a4735a8f5f4af5e2957b86a';
+        const API_KEY = '$2a$10$af69JbqOa6Kyd.O5qi70M.HHnHGjLK/lttwvA91sPhi2tCd6qIEVW';
+
+        // Base de datos en la nube (Sobres y Videos)
+        let baseDatosCloud = {
+            sobre1: false, sobre2: false, sobre3: false,
+            videos: [
+                { url: "https://www.youtube.com/embed/jfKfPfyJRdk", titulo: "Cuando te caíste 😂", categoria: "graciosos" }
+            ]
+        };
+
+        let fotosActivas = [];
+        let indexFotoActual = 0;
+
+        const PREMIOS_CUPONES = {
+            1: { txt: "¡Cupón Especial!<br>Este cupón sirve para canjear un boba te! 🧋", img: "cupon-boba.jpg" },
+            2: { txt: "¡Cupón Especial!<br>Este cupón te dará una vela aromática! 🕯️", img: "cupon-vela.jpg" },
+            3: { txt: "¡Cupón Especial!<br>Este cupón te dará una comidita en Qué Chuzo! 🌭", img: "cupon-chuzo.jpg" }
+        };
+
+        // --- SISTEMA DE LOGIN Y MÚSICA ---
+        function procesarLogin() {
+            let userField = document.getElementById('usuario').value.trim();
+            let passField = document.getElementById('contrasena').value.trim();
+
+            if (userField === "Ivanna" && passField === "aniversario 4") {
+                document.getElementById('msg-error').style.display = 'none';
+                
+                let audio = document.getElementById('musica-fondo');
+                audio.volume = 0.4;
+                audio.play().catch(e => console.log("Audio listo"));
+                document.getElementById('control-musica').style.display = 'flex';
+
+                setTimeout(() => {
+                    document.getElementById('login-caja').classList.add('caja-sube');
+                    document.getElementById('login-fondo').classList.add('fondo-baja');
+                    let mainFrame = document.getElementById('contenido-principal');
+                    mainFrame.style.display = 'block';
+
+                    setTimeout(() => {
+                        document.getElementById('pantalla-login').style.display = 'none';
+                        mainFrame.classList.add('contenido-crece');
+                        conectarNubeDescargar();
+                    }, 1100);
+                }, 1000);
+            } else {
+                document.getElementById('msg-error').style.display = 'block';
             }
         }
-    }
 
-    function dibujarTablero(conAnimacion = false) {
-        tableroHTML.innerHTML = "";
-        let cols = ['a','b','c','d','e','f','g','h'];
-        if(equipoJugador === 'b') cols.reverse();
-        
-        for (let i = 8; i >= 1; i--) {
-            let row = equipoJugador === 'w' ? i : 9 - i;
-            for (let j = 0; j < 8; j++) {
-                let col = cols[j];
-                let coord = col + row;
-                let pieza = juego.get(coord);
-                
-                let colorClase = (row + j) % 2 !== 0 ? 'blanca' : 'negra';
-                if(equipoJugador==='b') colorClase = (row + j) % 2 === 0 ? 'blanca' : 'negra';
-                
-                let htmlCasilla = `<div id="${coord}" class="${colorClase}">`;
-                if (j === 0) htmlCasilla += `<span class="coord-num">${row}</span>`;
-                if (i === 8) htmlCasilla += `<span class="coord-letra">${col.toUpperCase()}</span>`;
-                
-                if (pieza) {
-                    let delay = 0;
-                    if(conAnimacion) {
-                        if(pieza.color === 'w') delay = (row === 2) ? 0.2 : (row === 1 ? 0.4 : 0);
-                        else delay = (row === 7) ? 0.6 : (row === 8 ? 0.8 : 0);
-                    }
-                    let extraClass = conAnimacion ? 'animacion-entrada' : '';
-                    
-                    let claseFacultad = pieza.color === 'w' ? 'pieza-blanca-img' : 'pieza-negra-img';
-                    
-                    if (temaActual === 'tema6' && (row === 4 || row === 5)) {
-                        if (pieza.color === 'w') {
-                            htmlCasilla += `<div class="base-agua"></div>`;
-                        } else if (pieza.color === 'b') {
-                            extraClass += ' pieza-sumergida';
-                            htmlCasilla += `<div class="flotador-zombie"></div>`;
-                        }
-                    }
+        function toggleMusica() {
+            let audio = document.getElementById('musica-fondo');
+            let btn = document.getElementById('btn-play-pause');
+            if (audio.paused) {
+                audio.play();
+                btn.innerText = "⏸️";
+            } else {
+                audio.pause();
+                btn.innerText = "▶️";
+            }
+        }
 
-                    htmlCasilla += `<img src="${getArchivoPieza(pieza.type, pieza.color)}" class="pieza ${claseFacultad} ${extraClass}" style="animation-delay: ${delay}s" id="img-${coord}">`;
+        function cambiarVolumen() {
+            let slider = document.getElementById('slider-vol');
+            let audio = document.getElementById('musica-fondo');
+            audio.volume = slider.value / 100;
+            document.getElementById('texto-vol').innerText = slider.value + '%';
+        }
+
+        // --- CONEXIÓN CON LA NUBE (JSONBIN) ---
+        async function conectarNubeDescargar() {
+            try {
+                let respuesta = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { 'X-Master-Key': API_KEY } });
+                let parseo = await respuesta.json();
+                if (parseo.record) {
+                    baseDatosCloud = parseo.record;
+                    if (!baseDatosCloud.videos) baseDatosCloud.videos = [];
+                    pintarEstadosSobres();
+                    renderizarVideos();
                 }
-                htmlCasilla += `</div>`;
-                tableroHTML.innerHTML += htmlCasilla;
+            } catch (e) {
+                console.error("Fallo de red, cargando datos locales:", e);
+                renderizarVideos();
             }
         }
-        asignarEventosClic();
-    }
 
-    function mostrarPuntosGuia(casillaOrigen) {
-        document.querySelectorAll('.punto-guia').forEach(p => p.remove());
-        const movs = juego.moves({ square: casillaOrigen, verbose: true });
-        
-        movs.forEach((mov) => {
-            const dest = document.getElementById(mov.to);
-            if (dest) {
-                let file1 = casillaOrigen.charCodeAt(0), rank1 = parseInt(casillaOrigen[1]);
-                let file2 = mov.to.charCodeAt(0), rank2 = parseInt(mov.to[1]);
-                let dist = Math.max(Math.abs(file1-file2), Math.abs(rank1-rank2));
-                let delay = dist * 0.05; 
+        async function guardarEnNube() {
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+                    body: JSON.stringify(baseDatosCloud)
+                });
+            } catch (e) { console.error("Error guardando en nube:", e); }
+        }
 
-                const punto = document.createElement('div');
-                punto.classList.add('punto-guia');
-                punto.style.animationDelay = `${delay}s`;
-                dest.appendChild(punto);
+        // --- MANEJO DE SOBRES ---
+        function pintarEstadosSobres() {
+            for (let i = 1; i <= 3; i++) {
+                if (baseDatosCloud["sobre" + i] === true) {
+                    let imagenS = document.getElementById(`img-s${i}`);
+                    imagenS.src = `sobre-abierto-${i}.png`;
+                    imagenS.style.animation = 'none'; imagenS.onclick = null;
+                    document.getElementById(`btn-s${i}`).style.display = 'none';
+                    document.getElementById(`sello-s${i}`).style.display = 'block';
+                }
             }
-        });
-    }
+        }
 
-    let casillaSeleccionada = null;
-    function asignarEventosClic() {
-        document.querySelectorAll('.ajedrez div').forEach(c => {
-            c.addEventListener('click', function() {
-                if (!juegoIniciado || botPensando || juego.game_over()) return;
-                if (juego.turn() !== equipoJugador) return;
+        function clickSobre(idSobre) {
+            let imagenS = document.getElementById(`img-s${idSobre}`);
+            imagenS.src = `sobre-abierto-${idSobre}.png`;
+            imagenS.style.animation = 'none';
+            if (!baseDatosCloud["sobre" + idSobre]) document.getElementById(`btn-s${idSobre}`).style.display = 'inline-block';
+            desplegarModalCupon(idSobre);
+        }
 
-                if (casillaSeleccionada) {
-                    const movs = juego.moves({ square: casillaSeleccionada.id, verbose: true });
-                    const movDeseado = movs.find(m => m.to === this.id);
+        function canjearAccion(idSobre) {
+            document.getElementById(`btn-s${idSobre}`).style.display = 'none';
+            document.getElementById(`sello-s${idSobre}`).style.display = 'block';
+            document.getElementById(`img-s${idSobre}`).onclick = null;
+            baseDatosCloud["sobre" + idSobre] = true;
+            guardarEnNube();
+        }
 
-                    if (movDeseado) {
-                        document.querySelectorAll('.punto-guia').forEach(p => p.remove());
-                        
-                        if (movDeseado.flags.includes('p') || movDeseado.flags.includes('cp')) {
-                            movimientoPendiente = { from: casillaSeleccionada.id, to: this.id };
-                            abrirVista('modal-coronacion');
-                            document.getElementById('img-corona-q').src = getArchivoPieza('q', equipoJugador);
-                            document.getElementById('img-corona-r').src = getArchivoPieza('r', equipoJugador);
-                            document.getElementById('img-corona-b').src = getArchivoPieza('b', equipoJugador);
-                            document.getElementById('img-corona-n').src = getArchivoPieza('n', equipoJugador);
-                            casillaSeleccionada.classList.remove('seleccionada'); casillaSeleccionada = null;
-                            return; 
-                        }
+        // --- SISTEMA INTELIGENTE DE VIDEOS ---
+        function agregarVideoDesdePanel() {
+            let urlRaw = document.getElementById('vid-url').value.trim();
+            let titulo = document.getElementById('vid-titulo').value.trim();
+            let categoria = document.getElementById('vid-categoria').value;
 
-                        ejecutarMovimiento(casillaSeleccionada.id, this.id);
-                    } else {
-                        casillaSeleccionada.classList.remove('seleccionada');
-                        if (this.querySelector('img')) {
-                            casillaSeleccionada = this; this.classList.add('seleccionada');
-                            mostrarPuntosGuia(this.id);
-                        } else { casillaSeleccionada = null; document.querySelectorAll('.punto-guia').forEach(p => p.remove()); }
-                    }
+            if (!urlRaw || !titulo) {
+                alert("Por favor pon un link y un título para el video ❤️");
+                return;
+            }
+
+            let urlConvertida = urlRaw;
+            
+            // Convertidor mágico para links de Google Drive
+            if (urlRaw.includes("drive.google.com")) {
+                let idMatch = urlRaw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                if (idMatch && idMatch[1]) {
+                    urlConvertida = `https://drive.google.com/file/d/${idMatch[1]}/preview`;
                 } else {
-                    if (this.querySelector('img')) {
-                        casillaSeleccionada = this; this.classList.add('seleccionada');
-                        mostrarPuntosGuia(this.id);
-                    }
+                    urlConvertida = urlRaw.replace(/\/view.*|\/edit.*|\/sharing.*/, "/preview");
+                }
+            } 
+            // Convertidor mágico para links normales de YouTube
+            else if (urlRaw.includes("youtube.com/watch?v=") || urlRaw.includes("youtu.be/")) {
+                let vidId = urlRaw.split("v=")[1] || urlRaw.split("youtu.be/")[1];
+                if (vidId) {
+                    vidId = vidId.split("&")[0].split("?")[0];
+                    urlConvertida = `https://www.youtube.com/embed/${vidId}`;
+                }
+            }
+
+            baseDatosCloud.videos.push({ url: urlConvertida, titulo: titulo, categoria: categoria });
+            
+            // Limpiar campos
+            document.getElementById('vid-url').value = "";
+            document.getElementById('vid-titulo').value = "";
+
+            renderizarVideos();
+            guardarEnNube();
+            alert("¡Video guardado en la página con éxito! ✨");
+        }
+
+        function renderizarVideos() {
+            let catalogo = document.getElementById('catalogo-videos');
+            catalogo.innerHTML = "";
+
+            baseDatosCloud.videos.forEach(vid => {
+                let div = document.createElement('div');
+                div.className = `video-item ${vid.categoria}`;
+                div.innerHTML = `
+                    <div class="contenedor-iframe">
+                        <iframe src="${vid.url}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-titulo">${vid.titulo}</div>
+                `;
+                catalogo.appendChild(div);
+            });
+            
+            // Re-aplicar filtro actual
+            let btnActivo = document.querySelector('.btn-filtro.activo');
+            if (btnActivo) btnActivo.click();
+        }
+
+        function filtrarVideos(categoria, botonClickeado) {
+            if (botonClickeado) {
+                document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('activo'));
+                botonClickeado.classList.add('activo');
+            }
+            
+            document.querySelectorAll('.video-item').forEach(video => {
+                if (categoria === 'todos' || video.classList.contains(categoria)) {
+                    video.style.display = 'block';
+                } else {
+                    video.style.display = 'none';
                 }
             });
-        });
-    }
+        }
 
-    document.querySelectorAll('.btn-corona').forEach(b => b.addEventListener('click', function() { 
-        document.getElementById('modal-coronacion').classList.add('oculto');
-        ejecutarMovimiento(movimientoPendiente.from, movimientoPendiente.to, this.getAttribute('data-pieza'));
-        movimientoPendiente = null;
-    }));
+        // --- MODALES Y GALERÍA ---
+        function abrirFotoUnica(rutaImagen) {
+            fotosActivas = [rutaImagen]; indexFotoActual = 0;
+            ocultarTodosLosModales();
+            document.getElementById('modal-galeria-contenido').style.display = 'block';
+            document.querySelectorAll('.flecha').forEach(f => f.style.display = 'none');
+            document.getElementById('img-target-galeria').src = rutaImagen;
+            document.getElementById('txt-contador').innerText = "❤️";
+            document.getElementById('modal-sistema').classList.add('modal-activo');
+        }
 
-    function ejecutarMovimiento(origen, destino, promocion = 'q') {
-        const mov = juego.move({ from: origen, to: destino, promotion: promocion });
-        if(mov) {
-            casillaSeleccionada = null;
-            dibujarTablero();
-            let imgDestino = document.getElementById('img-' + destino);
-            if(imgDestino) {
-                imgDestino.classList.add('efecto-bamboleo');
-                setTimeout(() => imgDestino.classList.remove('efecto-bamboleo'), 300);
+        function abrirGaleria(listaFotos) {
+            fotosActivas = listaFotos; indexFotoActual = 0;
+            ocultarTodosLosModales();
+            document.getElementById('modal-galeria-contenido').style.display = 'block';
+            document.querySelectorAll('.flecha').forEach(f => f.style.display = 'flex');
+            actualizarFotoGaleria();
+            document.getElementById('modal-sistema').classList.add('modal-activo');
+        }
+
+        function pasarFoto(direccion) {
+            indexFotoActual += direccion;
+            if (indexFotoActual < 0) indexFotoActual = fotosActivas.length - 1;
+            if (indexFotoActual >= fotosActivas.length) indexFotoActual = 0;
+            actualizarFotoGaleria();
+        }
+
+        function actualizarFotoGaleria() {
+            document.getElementById('img-target-galeria').src = fotosActivas[indexFotoActual];
+            document.getElementById('txt-contador').innerText = `${indexFotoActual + 1} / ${fotosActivas.length} ❤️`;
+        }
+
+        function desplegarModalCupon(idSobre) {
+            ocultarTodosLosModales();
+            let cuponBox = document.getElementById('modal-cupon-contenido');
+            cuponBox.style.display = 'block';
+            let datosPremio = PREMIOS_CUPONES[idSobre];
+            document.getElementById('cupon-img').src = datosPremio.img;
+            document.getElementById('cupon-txt').innerHTML = datosPremio.txt;
+            document.getElementById('modal-sistema').classList.add('modal-activo');
+        }
+
+        function abrirModalAjedrez() {
+            ocultarTodosLosModales();
+            let audio = document.getElementById('musica-fondo');
+            if(audio) audio.pause();
+            document.getElementById('btn-play-pause').innerText = "▶️";
+
+            document.getElementById('modal-ajedrez-contenido').style.display = 'flex';
+            document.getElementById('modal-sistema').classList.add('modal-activo');
+        }
+
+        function ocultarTodosLosModales() {
+            document.getElementById('modal-galeria-contenido').style.display = 'none';
+            document.getElementById('modal-cupon-contenido').style.display = 'none';
+            document.getElementById('modal-ajedrez-contenido').style.display = 'none';
+        }
+
+        function cerrarCualquierModal(evento) {
+            if (evento.target.classList.contains('modal')) {
+                forzarCierreModal();
             }
-            procesarFinDeTurno(mov);
+        }
+
+        function forzarCierreModal() {
+            document.getElementById('modal-sistema').classList.remove('modal-activo');
             
-            if(!juego.game_over() && juego.turn() !== equipoJugador) {
-                setTimeout(realizarMovimientoBot, 500);
-            }
-        }
-    }
-
-function realizarMovimientoBot() {
-        if(juego.game_over()) return;
-        botPensando = true;
-        historialDiv.innerHTML += `<p style="color:var(--color-texto-cajas); font-style:italic;" id="msg-pensando">El bot esta pensando...</p>`;
-        historialDiv.scrollTop = historialDiv.scrollHeight;
-
-        setTimeout(() => {
-            const movs = juego.moves({ verbose: true });
-            if(movs.length > 0) {
-                
-                let m;
-                const botData = BOTS.find(b => b.id === botActual);
-                const diff = botData ? botData.diff : 1;
-
-                if (diff <= 3) {
-                    m = movs[Math.floor(Math.random() * movs.length)];
-                } else {
-                    let bestMove = null;
-                    let bestValue = -Infinity; // Empezamos en negativo por si hay jugadas malas
-                    
-                    const pieceValues = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 100 };
-                    const casillasCentro = ['d4', 'e4', 'd5', 'e5', 'c4', 'f4', 'c5', 'f5'];
-
-                    movs.forEach(move => {
-                        let moveValue = 0;
-                        
-                        // 1. Prioridad: Capturar
-                        if (move.captured) {
-                            moveValue += pieceValues[move.captured] * 10;
-                        }
-                        
-                        // 2. Prioridad: Coronar
-                        if (diff >= 8 && move.promotion) {
-                            moveValue += 80;
-                        }
-                        
-                        // 3. Prioridad: Jaques
-                        if (diff >= 6) {
-                            if (move.san.includes('#')) {
-                                moveValue += 10000; // Si es mate, no le importa nada más
-                            } else if (move.san.includes('+')) {
-                                moveValue += 5; // Bono por molestar con jaque
-                            }
-                        }
-                        
-                        // 4. Centro
-                        if (diff >= 10) {
-                            if (casillasCentro.includes(move.to)) {
-                                moveValue += 2;
-                            }
-                        }
-
-                        // --- 5. NUEVO: INSTINTO DE SUPERVIVENCIA (Dificultad 8+) ---
-                        // El bot evitará suicidarse a menos que sea para dar Jaque Mate
-                        if (diff >= 8 && !move.san.includes('#')) {
-                            
-                            // Simulamos la jugada en la mente del bot
-                            juego.move(move.san);
-                            
-                            // Calculamos si el jugador (tú) puede capturar a la pieza que el bot acaba de mover
-                            let respuestasJugador = juego.moves({ verbose: true });
-                            let meComen = false;
-                            
-                            for (let i = 0; i < respuestasJugador.length; i++) {
-                                // Si alguno de tus movimientos termina en la casilla donde el bot se paró...
-                                if (respuestasJugador[i].to === move.to) {
-                                    meComen = true;
-                                    break;
-                                }
-                            }
-                            
-                            // Deshacemos la simulación para volver al presente
-                            juego.undo();
-
-                            // Si la jugada resulta en muerte segura, la penalizamos fuertemente
-                            if (meComen) {
-                                // Le restamos el valor de su propia pieza multiplicada por 11.
-                                // Así, si cambia un Caballo (30 puntos) por otro Caballo (resta 33 puntos), 
-                                // preferirá no hacerlo a menos que no tenga otra opción.
-                                moveValue -= (pieceValues[move.piece] * 11);
-                            }
-                        }
-                        
-                        // Añadimos un pequeño decimal aleatorio para que sus partidas sean variadas
-                        moveValue += Math.random();
-
-                        if (moveValue > bestValue) {
-                            bestValue = moveValue;
-                            bestMove = move;
-                        }
-                    });
-                    
-                    m = bestMove || movs[Math.floor(Math.random() * movs.length)];
-                }
-
-                juego.move(m);
-                document.getElementById('msg-pensando').remove();
-                dibujarTablero();
-                
-                let imgDestino = document.getElementById('img-' + m.to);
-                if(imgDestino) {
-                    imgDestino.classList.add('efecto-bamboleo');
-                    setTimeout(() => imgDestino.classList.remove('efecto-bamboleo'), 300);
-                }
-                
-                procesarFinDeTurno(m);
-            }
-            botPensando = false;
-        }, 800);
-    }
-
-    function procesarFinDeTurno(mov) {
-        document.querySelectorAll('.en-jaque').forEach(c => c.classList.remove('en-jaque'));
-        
-        if (temaActual === 'tema6' && (mov.to.includes('4') || mov.to.includes('5'))) {
-            sonidoSplash.currentTime = 0; 
-            sonidoSplash.play().catch(e=>console.log(e));
-        }
-
-        if (mov.captured) {
-            let colorCapturado = mov.color === 'w' ? 'b' : 'w'; 
-            piezasCapturadas.push({ type: mov.captured, color: colorCapturado });
-            renderCementerio();
-        }
-
-        let isCaptura = mov.flags.includes('c') || mov.flags.includes('e');
-        if (isCaptura) {
-            if (mov.color === 'w') {
-                sonidoCapturaBlanca.currentTime = 0; 
-                sonidoCapturaBlanca.play().catch(e=>console.log(e));
-            } else {
-                sonidoCaptura.currentTime = 0; 
-                sonidoCaptura.play().catch(e=>console.log(e));
-            }
-            historialDiv.innerHTML += `<p class="jugada-captura">Captura en ${mov.to.toUpperCase()}</p>`;
-        } else {
-            sonidoMover.currentTime = 0; sonidoMover.play().catch(e=>console.log(e));
-            historialDiv.innerHTML += `<p class="jugada-normal">Movimiento a ${mov.to.toUpperCase()}</p>`;
-        }
-
-        if(juego.game_over()) {
-            marcarReyEnJaque();
-            setTimeout(() => {
-                if(juego.in_checkmate()) {
-                    let ganadorW = juego.turn() === 'b';
-                    if((ganadorW && equipoJugador === 'w') || (!ganadorW && equipoJugador === 'b')) {
-                        registrarVictoria();
-                        historialDiv.innerHTML += `<div class="texto-destacado-victoria">HAS DERROTADO AL BOT</div>`;
-                        abrirVista('modal-victoria');
-                    } else {
-                        historialDiv.innerHTML += `<div class="texto-destacado-derrota">TU REY HA SIDO DERROTADO</div>`;
-                        abrirVista('modal-derrota');
-                    }
-                } else {
-                    let razon = "Falta de material o repeticion.";
-                    if(juego.in_stalemate()) razon = "Rey Ahogado. No tienes movimientos legales pero no estas en jaque.";
-                    if(juego.in_threefold_repetition()) razon = "Repeticion de la misma posicion 3 veces.";
-                    
-                    document.getElementById('msg-empate').innerText = razon;
-                    historialDiv.innerHTML += `<div class="texto-destacado-empate">EMPATE: ${razon.toUpperCase()}</div>`;
-                    abrirVista('modal-empate');
-                }
-                renderBots();
-            }, 1500);
-        } else if (juego.in_check()) {
-            marcarReyEnJaque();
-            sonidoJaque.currentTime = 0; sonidoJaque.play().catch(e=>console.log(e));
-            historialDiv.innerHTML += `<p style="color:#d9534f; font-weight:bold;">JAQUE</p>`;
-        }
-        historialDiv.scrollTop = historialDiv.scrollHeight;
-    }
-
-    function renderCementerio() {
-        let html = '';
-        piezasCapturadas.forEach(pieza => {
-            let imagenSrc = getArchivoPieza(pieza.type, pieza.color);
-            html += `<img src="${imagenSrc}" class="pieza-muerta animacion-entrada">`;
-        });
-        document.getElementById('cementerio').innerHTML = html;
-        let cem = document.getElementById('cementerio');
-        cem.scrollTop = cem.scrollHeight;
-    }
-
-    function marcarReyEnJaque() {
-        let t = juego.turn();
-        let cols = ['a','b','c','d','e','f','g','h'];
-        for (let i=1; i<=8; i++) {
-            for (let j=0; j<8; j++) {
-                let p = juego.get(cols[j]+i);
-                if (p && p.type === 'k' && p.color === t) {
-                    let el = document.getElementById(cols[j]+i);
-                    if(el) el.classList.add('en-jaque');
+            if (document.getElementById('modal-ajedrez-contenido').style.display === 'flex') {
+                let audio = document.getElementById('musica-fondo');
+                if(audio) {
+                    audio.play().catch(e=>{});
+                    document.getElementById('btn-play-pause').innerText = "⏸️";
                 }
             }
+            ocultarTodosLosModales();
         }
-    }
-
-    function abrirVista(id) {
-        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('oculto'));
-        document.getElementById(id).classList.remove('oculto');
-    }
-    function cerrarVistas() {
-        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('oculto'));
-    }
-    function cerrarYReiniciar() {
-        cerrarVistas();
-        reiniciarPartidaManual();
-    }
-  </script>
+    </script>
 </body>
 </html>
