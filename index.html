@@ -119,21 +119,37 @@
         }
         .panel-agregar-video h4 { color: var(--texto-titulos); margin-bottom: 15px; font-size: 18px; text-align: center; }
         .inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-        .input-video { width: 100%; padding: 12px; border: 2px solid var(--azul-pastel); border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; }
-        .select-video { width: 100%; padding: 12px; border: 2px solid var(--azul-pastel); border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; background: white; color: var(--texto-parrafos); font-weight: bold; }
-        .btn-agregar-vid { background: var(--texto-titulos); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; transition: 0.3s; }
+        .input-video, .select-video { width: 100%; padding: 12px; border: 2px solid var(--azul-pastel); border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; background: white; color: var(--texto-parrafos); }
+        .select-video { font-weight: bold; cursor: pointer; }
+        .btn-agregar-vid { background: var(--texto-titulos); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; transition: 0.3s; grid-column: span 2; }
         .btn-agregar-vid:hover { background: #6a053c; }
 
-        /* Filtros y Catálogo */
+        /* Filtros y Catálogo de Tarjetas */
         .filtros-videos { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
         .btn-filtro { background: var(--azul-pastel); color: var(--texto-parrafos); border: 2px solid var(--texto-parrafos); padding: 10px 24px; border-radius: 20px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
         .btn-filtro:hover, .btn-filtro.activo { background: var(--texto-titulos); color: white; border-color: var(--texto-titulos); }
         
-        .grid-videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .video-item { background: var(--fondo-cartas); padding: 15px; border-radius: 16px; box-shadow: 0 8px 25px var(--sombra); transition: transform 0.3s; position: relative; }
-        .video-item:hover { transform: translateY(-5px); }
-        .contenedor-iframe { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: #000; }
-        .contenedor-iframe iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .grid-videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; }
+        
+        /* Diseño de Tarjeta de Video (Limpia, sin Iframe) */
+        .tarjeta-video {
+            background: var(--fondo-cartas); padding: 15px; border-radius: 16px; 
+            box-shadow: 0 8px 25px var(--sombra); transition: transform 0.3s; cursor: pointer;
+        }
+        .tarjeta-video:hover { transform: translateY(-5px) scale(1.02); }
+        .portada-video {
+            background: linear-gradient(135deg, var(--azul-pastel), #f48fb1);
+            height: 160px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        .icono-play {
+            font-size: 50px; text-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s;
+        }
+        .tarjeta-video:hover .icono-play { transform: scale(1.2); }
+        .etiqueta-tipo {
+            position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.5);
+            color: white; font-size: 11px; padding: 4px 8px; border-radius: 10px; font-weight: bold;
+        }
         .video-titulo { font-family: 'Quicksand', sans-serif; font-weight: bold; color: var(--texto-parrafos); margin-top: 15px; font-size: 16px; }
 
         /* --- 4. SECCIÓN REGALOS (SOBRES) --- */
@@ -157,7 +173,7 @@
         /* --- VENTANAS MODALES --- */
         .modal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(136, 14, 79, 0.65); backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
             z-index: 10000; display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
         }
@@ -176,9 +192,19 @@
         .cupon-img-circular { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--texto-titulos); flex-shrink: 0; }
         .cupon-texto { font-size: 22px; font-weight: 700; color: var(--texto-titulos); text-align: left; line-height: 1.4; }
         
+        /* Modal Ajedrez */
         .ajedrez-box { width: 95vw; max-width: 1200px; height: 90vh; background: var(--fondo-principal); border-radius: 16px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         .ajedrez-box iframe { flex: 1; width: 100%; height: 100%; border: none; border-radius: 16px; }
         
+        /* NUEVO: Modal de Video Dinámico (Vertical / Horizontal) */
+        .modal-video-box { position: relative; background: #000; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); display: flex; flex-direction: column; width: 95vw; }
+        .modal-video-box iframe { width: 100%; height: 100%; border: none; border-radius: 16px; }
+        
+        /* Formato Horizontal (Cine) */
+        .modal-video-box.horizontal { max-width: 1000px; aspect-ratio: 16 / 9; height: auto; }
+        /* Formato Vertical (Reels / TikToks) */
+        .modal-video-box.vertical { max-width: 450px; aspect-ratio: 9 / 16; height: 85vh; width: auto; }
+
         .btn-cerrar-modal { position: absolute; top: -15px; right: -15px; background: #d32f2f; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 18px; z-index: 500; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
         @media (max-width: 768px) {
@@ -190,22 +216,29 @@
             .flecha-izq { left: -10px; } .flecha-der { right: -10px; }
             .ajedrez-box { height: 85vh; }
             .inputs-grid { grid-template-columns: 1fr; }
+            .btn-agregar-vid { grid-column: span 1; }
             #control-musica { top: 10px; right: 10px; padding: 6px 12px; }
+            /* En celular, el horizontal se adapta al ancho y el vertical al alto */
+            .modal-video-box.horizontal { width: 95vw; height: auto; }
+            .modal-video-box.vertical { height: 85vh; width: auto; max-width: 95vw; }
         }
     </style>
 </head>
 <body>
 
+    <!-- AUDIO DE FONDO -->
     <audio id="musica-fondo" loop>
         <source src="cancion.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- BARRA DE CONTROL DE MÚSICA ESTILO AJEDREZ -->
     <div id="control-musica">
         <button class="btn-musica" id="btn-play-pause" onclick="toggleMusica()">⏸️</button>
         <input type="range" class="vol-slider" id="slider-vol" min="0" max="100" value="40" oninput="cambiarVolumen()">
         <span class="vol-texto" id="texto-vol">40%</span>
     </div>
 
+    <!-- PANTALLA DE INICIO DE SESIÓN -->
     <div id="pantalla-login">
         <div id="login-fondo"></div>
         <div id="login-caja">
@@ -217,6 +250,7 @@
         </div>
     </div>
 
+    <!-- CONTENIDO PRINCIPAL -->
     <div id="contenido-principal">
         
         <img src="mascota-animada.png" class="mascota-esquina" alt="Mascota">
@@ -226,6 +260,7 @@
             <h2>04/07/2026</h2>
         </header>
 
+        <!-- SECCIÓN 1: RECUERDOS -->
         <main class="contenedor-recuerdos">
             <div class="bloque-recuerdo">
                 <div class="texto-carta">
@@ -266,6 +301,7 @@
             </div>
         </main>
 
+        <!-- SECCIÓN 2: ZONA DE JUEGO (AJEDREZ) -->
         <section class="zona-juego">
             <h3>Zona de Juego</h3>
             <div class="caja-juego">
@@ -274,25 +310,32 @@
             </div>
         </section>
 
+        <!-- SECCIÓN 3: VIDEOS CON PANEL AGREGADOR Y TARJETAS -->
         <section class="seccion-videos">
             <h3>Nuestros Videos</h3>
             
+            <!-- PANEL PARA AGREGAR VIDEOS MÁGICAMENTE -->
             <div class="panel-agregar-video">
-                <h4>➕ Agregar un nuevo video (Drive o YouTube)</h4>
+                <h4>➕ Agregar un nuevo video a la galería</h4>
                 <div class="inputs-grid">
-                    <input type="text" id="vid-url" class="input-video" placeholder="Pega el link de Drive o YouTube aquí...">
+                    <input type="text" id="vid-url" class="input-video" placeholder="Link de YouTube, Drive, Shorts, Reels...">
                     <input type="text" id="vid-titulo" class="input-video" placeholder="Título (ej. Viaje a la playa)">
                 </div>
-                <div class="inputs-grid" style="grid-template-columns: 1fr 2fr;">
+                <div class="inputs-grid">
                     <select id="vid-categoria" class="select-video">
-                        <option value="recuerdos">Recuerdos</option>
-                        <option value="graciosos">Graciosos</option>
-                        <option value="mensajes">Mensajes</option>
+                        <option value="recuerdos">Categoría: Recuerdos</option>
+                        <option value="graciosos">Categoría: Graciosos</option>
+                        <option value="mensajes">Categoría: Mensajes</option>
                     </select>
-                    <button class="btn-agregar-vid" onclick="agregarVideoDesdePanel()">Guardar Video en la Página ✨</button>
+                    <select id="vid-tipo" class="select-video">
+                        <option value="horizontal">Formato: 📺 Cine (Horizontal)</option>
+                        <option value="vertical">Formato: 📱 Reel / Short (Vertical)</option>
+                    </select>
                 </div>
+                <button class="btn-agregar-vid" onclick="agregarVideoDesdePanel()">Guardar Video en la Página ✨</button>
             </div>
 
+            <!-- Botones de Filtro -->
             <div class="filtros-videos">
                 <button class="btn-filtro activo" onclick="filtrarVideos('todos', this)">Todos</button>
                 <button class="btn-filtro" onclick="filtrarVideos('recuerdos', this)">Recuerdos</button>
@@ -300,10 +343,13 @@
                 <button class="btn-filtro" onclick="filtrarVideos('mensajes', this)">Mensajes</button>
             </div>
 
+            <!-- Catálogo donde aparecerán las Tarjetas de Videos Limpias -->
             <div class="grid-videos" id="catalogo-videos">
-                </div>
+                <!-- Se llenará automáticamente desde la nube -->
+            </div>
         </section>
 
+        <!-- SECCIÓN 4: SOBRES DE REGALOS -->
         <section class="seccion-sobres">
             <h3>Tus Regalitos Especiales</h3>
             <div class="grid-sobres">
@@ -328,8 +374,10 @@
         </section>
     </div>
 
+    <!-- MODALES (PANTALLAS SUPERPUESTAS OSCURAS) -->
     <div id="modal-sistema" class="modal" onclick="cerrarCualquierModal(event)">
         
+        <!-- 1. Modal de Galería de Fotos -->
         <div id="modal-galeria-contenido" class="galeria-box" style="display:none;">
             <button class="flecha flecha-izq" onclick="pasarFoto(-1)">‹</button>
             <img id="img-target-galeria" src="" alt="Vista ampliada">
@@ -337,6 +385,7 @@
             <p id="txt-contador" class="txt-galeria-info"></p>
         </div>
 
+        <!-- 2. Modal de Cupón de Regalo -->
         <div id="modal-cupon-contenido" class="cupon-box" style="display:none;" onclick="event.stopPropagation()">
             <div class="cupon-interior">
                 <button class="btn-cerrar-modal" onclick="forzarCierreModal()">X</button>
@@ -345,9 +394,16 @@
             </div>
         </div>
 
+        <!-- 3. Modal de Ajedrez -->
         <div id="modal-ajedrez-contenido" class="ajedrez-box" style="display:none;" onclick="event.stopPropagation()">
             <button class="btn-cerrar-modal" onclick="forzarCierreModal()">X</button>
-            <iframe src="ajedrez.html" id="iframe-ajedrez"></iframe>
+            <iframe src="" id="iframe-ajedrez"></iframe>
+        </div>
+
+        <!-- 4. NUEVO: Modal de Video Dinámico -->
+        <div id="modal-video-contenido" class="modal-video-box horizontal" style="display:none;" onclick="event.stopPropagation()">
+            <button class="btn-cerrar-modal" onclick="forzarCierreModal()">X</button>
+            <iframe src="" id="iframe-video-modal" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
 
     </div>
@@ -357,11 +413,11 @@
         const BIN_ID = '6a4735a8f5f4af5e2957b86a';
         const API_KEY = '$2a$10$af69JbqOa6Kyd.O5qi70M.HHnHGjLK/lttwvA91sPhi2tCd6qIEVW';
 
-        // Base de datos en la nube (Sobres y Videos)
+        // Base de datos en la nube
         let baseDatosCloud = {
             sobre1: false, sobre2: false, sobre3: false,
             videos: [
-                { url: "https://www.youtube.com/embed/jfKfPfyJRdk", titulo: "Cuando te caíste 😂", categoria: "graciosos" }
+                { url: "https://www.youtube.com/embed/jfKfPfyJRdk", titulo: "Cuando te caíste 😂", categoria: "graciosos", tipo: "horizontal" }
             ]
         };
 
@@ -484,6 +540,7 @@
             let urlRaw = document.getElementById('vid-url').value.trim();
             let titulo = document.getElementById('vid-titulo').value.trim();
             let categoria = document.getElementById('vid-categoria').value;
+            let tipo = document.getElementById('vid-tipo').value;
 
             if (!urlRaw || !titulo) {
                 alert("Por favor pon un link y un título para el video ❤️");
@@ -492,7 +549,7 @@
 
             let urlConvertida = urlRaw;
             
-            // Convertidor mágico para links de Google Drive
+            // Magia para Drive
             if (urlRaw.includes("drive.google.com")) {
                 let idMatch = urlRaw.match(/\/d\/([a-zA-Z0-9_-]+)/);
                 if (idMatch && idMatch[1]) {
@@ -501,24 +558,27 @@
                     urlConvertida = urlRaw.replace(/\/view.*|\/edit.*|\/sharing.*/, "/preview");
                 }
             } 
-            // Convertidor mágico para links normales de YouTube
-            else if (urlRaw.includes("youtube.com/watch?v=") || urlRaw.includes("youtu.be/")) {
-                let vidId = urlRaw.split("v=")[1] || urlRaw.split("youtu.be/")[1];
-                if (vidId) {
-                    vidId = vidId.split("&")[0].split("?")[0];
-                    urlConvertida = `https://www.youtube.com/embed/${vidId}`;
+            // Magia para YouTube Normal o Shorts
+            else if (urlRaw.includes("youtube.com") || urlRaw.includes("youtu.be")) {
+                let vidId = "";
+                if(urlRaw.includes("/shorts/")) {
+                    vidId = urlRaw.split("/shorts/")[1].split("?")[0];
+                } else if(urlRaw.includes("v=")) {
+                    vidId = urlRaw.split("v=")[1].split("&")[0];
+                } else if(urlRaw.includes("youtu.be/")) {
+                    vidId = urlRaw.split("youtu.be/")[1].split("?")[0];
                 }
+                if (vidId) urlConvertida = `https://www.youtube.com/embed/${vidId}?autoplay=1`;
             }
 
-            baseDatosCloud.videos.push({ url: urlConvertida, titulo: titulo, categoria: categoria });
+            baseDatosCloud.videos.push({ url: urlConvertida, titulo: titulo, categoria: categoria, tipo: tipo });
             
-            // Limpiar campos
             document.getElementById('vid-url').value = "";
             document.getElementById('vid-titulo').value = "";
 
             renderizarVideos();
             guardarEnNube();
-            alert("¡Video guardado en la página con éxito! ✨");
+            alert("¡Video guardado exitosamente! ✨");
         }
 
         function renderizarVideos() {
@@ -527,17 +587,22 @@
 
             baseDatosCloud.videos.forEach(vid => {
                 let div = document.createElement('div');
-                div.className = `video-item ${vid.categoria}`;
+                div.className = `tarjeta-video ${vid.categoria}`;
+                // Al darle clic a la tarjeta, se abre el Modal Gigante con la URL y el Tipo (Horizontal/Vertical)
+                div.onclick = () => abrirModalVideo(vid.url, vid.tipo || 'horizontal');
+                
+                let etiqueta = vid.tipo === 'vertical' ? '📱 Reel' : '📺 Cine';
+
                 div.innerHTML = `
-                    <div class="contenedor-iframe">
-                        <iframe src="${vid.url}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <div class="portada-video">
+                        <span class="etiqueta-tipo">${etiqueta}</span>
+                        <span class="icono-play">🎬</span>
                     </div>
                     <div class="video-titulo">${vid.titulo}</div>
                 `;
                 catalogo.appendChild(div);
             });
             
-            // Re-aplicar filtro actual
             let btnActivo = document.querySelector('.btn-filtro.activo');
             if (btnActivo) btnActivo.click();
         }
@@ -548,7 +613,7 @@
                 botonClickeado.classList.add('activo');
             }
             
-            document.querySelectorAll('.video-item').forEach(video => {
+            document.querySelectorAll('.tarjeta-video').forEach(video => {
                 if (categoria === 'todos' || video.classList.contains(categoria)) {
                     video.style.display = 'block';
                 } else {
@@ -557,7 +622,7 @@
             });
         }
 
-        // --- MODALES Y GALERÍA ---
+        // --- MODALES (FOTOS, CUPONES, AJEDREZ, VIDEOS) ---
         function abrirFotoUnica(rutaImagen) {
             fotosActivas = [rutaImagen]; indexFotoActual = 0;
             ocultarTodosLosModales();
@@ -599,13 +664,36 @@
             document.getElementById('modal-sistema').classList.add('modal-activo');
         }
 
+        // --- APERTURA DE MODALES INTERACTIVOS (AJEDREZ Y VIDEO) ---
         function abrirModalAjedrez() {
             ocultarTodosLosModales();
+            
             let audio = document.getElementById('musica-fondo');
             if(audio) audio.pause();
             document.getElementById('btn-play-pause').innerText = "▶️";
 
+            // Inyectamos el archivo de ajedrez al abrir
+            document.getElementById('iframe-ajedrez').src = "ajedrez.html";
+
             document.getElementById('modal-ajedrez-contenido').style.display = 'flex';
+            document.getElementById('modal-sistema').classList.add('modal-activo');
+        }
+
+        function abrirModalVideo(url, tipo) {
+            ocultarTodosLosModales();
+            
+            let audio = document.getElementById('musica-fondo');
+            if(audio) audio.pause();
+            document.getElementById('btn-play-pause').innerText = "▶️";
+
+            let cajaVideo = document.getElementById('modal-video-contenido');
+            // Le aplicamos la clase horizontal o vertical para que tome la forma correcta
+            cajaVideo.className = 'modal-video-box ' + tipo;
+            
+            // Le inyectamos el link del video para que empiece
+            document.getElementById('iframe-video-modal').src = url;
+
+            cajaVideo.style.display = 'flex';
             document.getElementById('modal-sistema').classList.add('modal-activo');
         }
 
@@ -613,6 +701,7 @@
             document.getElementById('modal-galeria-contenido').style.display = 'none';
             document.getElementById('modal-cupon-contenido').style.display = 'none';
             document.getElementById('modal-ajedrez-contenido').style.display = 'none';
+            document.getElementById('modal-video-contenido').style.display = 'none';
         }
 
         function cerrarCualquierModal(evento) {
@@ -624,14 +713,25 @@
         function forzarCierreModal() {
             document.getElementById('modal-sistema').classList.remove('modal-activo');
             
-            if (document.getElementById('modal-ajedrez-contenido').style.display === 'flex') {
+            let jugarAjedrez = document.getElementById('modal-ajedrez-contenido').style.display === 'flex';
+            let viendoVideo = document.getElementById('modal-video-contenido').style.display === 'flex';
+
+            // Desconectar iframes para que se apague el audio del juego o del video de inmediato
+            document.getElementById('iframe-ajedrez').src = "";
+            document.getElementById('iframe-video-modal').src = "";
+
+            if (jugarAjedrez || viendoVideo) {
                 let audio = document.getElementById('musica-fondo');
                 if(audio) {
                     audio.play().catch(e=>{});
                     document.getElementById('btn-play-pause').innerText = "⏸️";
                 }
             }
-            ocultarTodosLosModales();
+            
+            // Pequeña pausa visual antes de ocultar para mantener fluida la animación de cierre
+            setTimeout(() => {
+                ocultarTodosLosModales();
+            }, 300);
         }
     </script>
 </body>
